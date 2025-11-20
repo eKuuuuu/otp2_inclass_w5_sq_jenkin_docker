@@ -30,6 +30,22 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat """
+                        ${tool 'SonarScanner'}\\bin\\sonar-scanner ^
+                        -Dsonar.projectKey=sq_jenkins_docker ^
+                        -Dsonar.sources=src ^
+                        -Dsonar.projectName="sq jenkins docker" ^
+                        -Dsonar.host.url=http://localhost:9000 ^
+                        -Dsonar.login=${env.SONAR_TOKEN} ^
+                        -Dsonar.java.binaries=target/classes
+                    """
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat "docker build -t ${env.DOCKER_IMAGE} ."
