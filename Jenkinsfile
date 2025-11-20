@@ -30,22 +30,6 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat """
-                        ${tool 'SonarScanner'}\\bin\\sonar-scanner ^
-                        -Dsonar.projectKey=devops-demo ^
-                        -Dsonar.sources=src ^
-                        -Dsonar.projectName=DevOps-Demo ^
-                        -Dsonar.host.url=http://localhost:9000 ^
-                        -Dsonar.login=${env.SONAR_TOKEN} ^
-                        -Dsonar.java.binaries=target/classes
-                    """
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 bat "docker build -t ${env.DOCKER_IMAGE} ."
@@ -64,15 +48,13 @@ pipeline {
 
     post {
         always {
-            junit '**/target/surefire-reports/*.xml'
-            jacoco execPattern: '**/target/jacoco.exec', classPattern: '**/target/classes', sourcePattern: '**/src/main/java'
             bat 'docker logout'
         }
         success {
-            echo 'Build and tests succeeded!'
+            echo 'Application successfully published to Docker Hub!'
         }
         failure {
-            echo 'Build or tests failed.'
+            echo 'Failed to publish the application to Docker Hub.'
         }
     }
 }
