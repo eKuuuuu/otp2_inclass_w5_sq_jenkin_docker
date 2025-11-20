@@ -1,9 +1,9 @@
 pipeline {
     agent any
     tools {
-        maven 'ChocoMaven'
+        maven 'choco_maven'
         git 'Default'
-        jdk 'JDK'
+        jdk 'jdk_21'
     }
 
     environment {
